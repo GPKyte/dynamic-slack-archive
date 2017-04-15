@@ -1,0 +1,10 @@
+
+How are events formatted in slack?
+May need to learn SQL to export portions of .sqlite into JSON files
+What is the diff between pass and continue in python, specifically with for loops involved
+	continue goes onto the next loop interation, pass is a placeholder that does nothing
+
+How is the timestamp formatted in Slack?
+	It may be referenced in the other files, definitely check for what's been done already.
+	It is referenced in archivebot.py which imports a module: datetime.
+

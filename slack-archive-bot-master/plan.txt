@@ -1,0 +1,47 @@
+Goal is to create a script, possibly in python that will
+interact with a .sqlite file and from it save all of the messages
+of the day.
+
+The messages will be saved in JSON format. Multiple messages
+will be grouped together by channel and saved into one JSON file
+that will be titled with the repective timestamp.
+
+The scrpit will likely be run at midnight andadd all of the files
+to their respective channel folders. From there, the
+Slack archive viewer will reset and publish the new day's data
+to the server in whatever form is eventually decided on.
+	Note: the slack viewer should ideally be modified to
+	work within the extrated form, rather than the zip
+	so that we can save a step in this process
+
+Some potential exceptions and errors to consider:
+- what happens when a channel is added
+-   deleted
+- Some goes for users
+- what if we want to include DMs? Likely won't be necssary
+- What happns when a user posts a gif, file, picture,
+  or other form of message that doesn't have text?
+	the current bot won't account for those instances
+  - But in response, we shouldn't need those stored because
+    realistically, this service is for training purposes
+    and a link should suffice to any relevant material
+
+
+So in psuedeo-code:
+import datetime
+import os
+
+from slackclient import SlackClient
+
+
+archive =  messages.sqlite
+new_msgs = get_todays_messages(archive)
+
+for channel in new_messages:
+  path = os.getPath().append(channel_name)
+  save_file = create_json(new_msgs[channel])
+  name = get_day(new_msgs[ts][0])
+  make_new(path, save_file, name)
+
+update_channels()
+update_users()

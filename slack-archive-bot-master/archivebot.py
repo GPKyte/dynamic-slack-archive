@@ -7,13 +7,19 @@ import traceback
 from slackclient import SlackClient
 from websocket import WebSocketConnectionClosedException
 
+# Connects to the previously created SQL database
 conn = sqlite3.connect('messages.sqlite')
 cursor = conn.cursor()
+# Does something with the table in messages
 cursor.execute('create table if not exists messages (message text, user text, channel text, timestamp text, UNIQUE(channel, timestamp) ON CONFLICT REPLACE)')
 
+# This token is given when the bot is called in terminal
 slack_token = os.environ["SLACK_API_TOKEN"]
+# Makes bot user active on Slack, NOTE: terminal must be running for the bot to continue
 sc = SlackClient(slack_token)
 
+# Double naming for better search functionality
+# Keys are both the name and unique ID where needed
 ENV = {
     'user_id': {},
     'id_user': {},
@@ -21,22 +27,30 @@ ENV = {
     'id_channel': {}
 }
 
+# Uses slack API to get most recent user list
+# Necessary for User ID correlation
 def update_users():
     info = sc.api_call('users.list')
     ENV['user_id'] = dict([(m['name'], m['id']) for m in info['members']])
     ENV['id_user'] = dict([(m['id'], m['name']) for m in info['members']])
 
+# Double check involved here,
+# updates user list if id not found,
+# and if still not there, None returned
 def get_user_name(uid):
     if uid not in ENV['id_user']:
         update_users()
     return ENV['id_user'].get(uid, None)
 
+# Same as get_user_name but with name as key
 def get_user_id(name):
     if name not in ENV['user_id']:
         update_users()
     return ENV['user_id'].get(name, None)
 
 
+# Same as update_users
+# necessary correlation for search
 def update_channels():
     info = sc.api_call('channels.list')
     ENV['channel_id'] = dict([(m['name'], m['id']) for m in info['channels']])
@@ -79,6 +93,7 @@ def handle_query(event):
             or desc if you want to start from the newest. Default asc.
         limit: The number of responses to return. Default 10.
     """
+
     try:
         text = []
         user = None
@@ -89,6 +104,7 @@ def handle_query(event):
         params = event['text'].lower().split()
         for p in params:
             # Handle emoji
+            # usual format is " :smiley_face: "
             if len(p) > 2 and p[0] == ':' and p[-1] == ':':
                 text.append(p)
                 continue
