@@ -8,3 +8,6 @@ How is the timestamp formatted in Slack?
 	It may be referenced in the other files, definitely check for what's been done already.
 	It is referenced in archivebot.py which imports a module: datetime.
 
+Currently have a model that turns the sqlite into JSON files in each dir
+Now we need to change the header names of the sqlite dictionary to match Slack
+but for lower coupling, we will make that change in the bridge app if possible
