@@ -9,12 +9,6 @@ import json
 
 from slackclient import SlackClient
 
-directory = sys.argv[1]
-time = time.time() - 2*86400
-
-def getDate(ts):
-  return datetime.datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d')
-
 def dict_factory(cursor, row):
   d = {}
   for index, column in enumerate(cursor.description):
@@ -25,7 +19,10 @@ def get_channel_name(id):
   #print(id)
   return ENV['id_channel'].get(id, 'None')
 
-# Look into why this works
+def getDate(ts):
+  return datetime.datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d')
+
+### Taken from StackOverflow
 def byteify(input):
   if isinstance(input, dict):
     return {byteify(key): byteify(value)
@@ -36,12 +33,24 @@ def byteify(input):
     return input.encode('utf-8')
   else:
     return input
+###
+
+
+
+db_directory = sys.argv[1]
+directory = os.path.join(os.path.curdir, "EBTH_SlackArchive")
+time = time.time() - 86400
+getAll = raw_input("Do you want to export all messages instead of last day?(y/N)").lower()
+if (getAll=='y'):
+  time = 0.0
+
+path_to_db = os.path.join(db_directory, "messages.sqlite")
 
 # Establish connection to SQL database
-connection = sqlite3.connect("messages.sqlite")
+connection = sqlite3.connect(path_to_db)
 connection.row_factory = dict_factory
-
 cursor = connection.cursor()
+
 
 with open(os.path.join(directory, "channels.json")) as f:
   channels = byteify(json.load(f))
@@ -52,19 +61,14 @@ ENV = {
   'id_channel': {},
 }
 
-
 ENV['channel_id'] = dict([(m['name'], m['id']) for m in channels])
 ENV['id_channel'] = dict([(m['id'], m['name']) for m in channels])
-#print(ENV['channel_id'])
-#print(ENV['id_channel'])
 
-
-# Translate database into JSON format
 command = ("SELECT * FROM messages WHERE timestamp > %s ORDER BY channel, timestamp") % time
 cursor.execute(command)
 results = byteify(cursor.fetchall())
 
-channel_msgs = dict([(c['name'], []) for c in channels])
+channel_msgs = dict([(c['name'], {}) for c in channels])
 
 for message in results:
   message['text'] = message['message']
@@ -77,8 +81,12 @@ for message in results:
   if channel_name == "None":
     continue
 
-  channel_msgs[channel_name].append(message)
-
+  # timestamp format is #########.######
+  day = getDate(message['ts'].split('.')[0])
+  if channel_msgs[channel_name].get(day, None):
+    channel_msgs[channel_name][day].append(message)
+  else:
+    channel_msgs[channel_name][day] = [message]
 
 # Go to channel folder and title message collection as <date>.json
 for channel_name in channel_msgs.keys():
@@ -96,12 +104,11 @@ for channel_name in channel_msgs.keys():
   if not os.path.exists(dir):
     os.makedirs(dir)
 
-  timestamp = getDate(channel_msgs[channel_name][0]['ts'].split('.')[0])
-  file = os.path.join(dir, "%s.json") % timestamp
-
-  with open(file, 'w') as outfile:
-    json.dump(channel_msgs[channel_name], outfile)
-    outfile.close()
+  for day in channel_msgs[channel_name].keys():
+    file = os.path.join(dir, "%s.json") % day
+    with open(file, 'w') as outfile:
+      json.dump(channel_msgs[channel_name][day], outfile)
+      outfile.close()
 
 
 
