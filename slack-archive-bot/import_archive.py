@@ -18,7 +18,6 @@ for channel in channels:
 
     files = glob.glob(os.path.join(directory, channel['name'], '*.json'))
     for file_name in files:
-	print(file_name)
         with open(file_name) as f:
             messages = json.load(f)
 
