@@ -1,4 +1,6 @@
 #!/bin/python
+# Usage: python export.py <path_to_database> <path_for_new_folder>
+# Output: folder in given directory
 
 import datetime
 import time
@@ -9,19 +11,14 @@ import json
 
 from slackclient import SlackClient
 
+# Used in conjunction with sqlite3 to generate JSON-like format
 def dict_factory(cursor, row):
     d = {}
     for index, column in enumerate(cursor.description):
         d[column[0]] = row[index]
     return d
 
-def get_channel_name(id):
-    return ENV['id_channel'].get(id, 'None')
-
-def getDate(ts):
-    return datetime.datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d')
-
-### Taken from StackOverflow, turns unicode into text
+# Turns unicode into text
 def byteify(input):
     if isinstance(input, dict):
         return {byteify(key): byteify(value)
@@ -32,18 +29,26 @@ def byteify(input):
         return input.encode('utf-8')
     else:
         return input
-###
 
-db_directory = sys.argv[1]
-db_path = os.path.join(db_directory, "messages.sqlite")
-arch_dir = os.path.join(os.path.curdir, "SlackArchive")
+def get_channel_name(id):
+    return ENV['id_channel'].get(id, 'None')
+
+def getDate(ts):
+    return datetime.datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d')
+
+
+
+time = time.time() - 86400 # One full day in seconds
+db_path = sys.argv[1]
+arch_dir = sys.argv[2]
 if not os.path.isdir(arch_dir):
     os.makedirs(arch_dir) 
+    time = 0.0 # Full export instead of day export
 
-time = time.time() - 86400
-getAll = raw_input("Do you want to export all messages instead of last day?(y/N) ").lower()
-if (getAll=='y'):
-    time = 0.0
+# Uncomment if you need to export entire archive or make this choice
+# getAll = raw_input("Do you want to export all messages instead of last day?(y/N) ").lower()
+# if (getAll=='y'):
+#    time = 0.0
 
 
 # Establish connection to SQL database
@@ -51,6 +56,7 @@ connection = sqlite3.connect(db_path)
 connection.row_factory = dict_factory
 cursor = connection.cursor()
 
+# Get channel and user data
 cursor.execute("SELECT * FROM channels")
 channels = byteify(cursor.fetchall())
 cursor.execute("SELECT * FROM users")
@@ -59,16 +65,7 @@ for u in users:
     u['profile'] = {}
     u['profile']['image_32'] = u.pop('avatar')
 
-# Define the names associated with each channel id
-ENV = {
-    'channel_id': {}, 
-    'id_channel': {},
-}
-
-ENV['channel_id'] = dict([(m['name'], m['id']) for m in channels])
-ENV['id_channel'] = dict([(m['id'], m['name']) for m in channels])
-
-# Add channel and user list files to archive directory
+# Save channel and user data files to archive folder
 channel_file = os.path.join(arch_dir, 'channels.json')
 with open(channel_file, 'w') as outfile:
     json.dump(channels, outfile)
@@ -79,12 +76,21 @@ with open(user_file, 'w') as outfile:
     outfile.close()
 
 
+# Define the names associated with each channel id
+ENV = {
+    'channel_id': {}, 
+    'id_channel': {},
+}
 
+ENV['channel_id'] = dict([(m['name'], m['id']) for m in channels])
+ENV['id_channel'] = dict([(m['id'], m['name']) for m in channels])
+
+# Get all messages after given time (in seconds since the Epoch)
 command = ("SELECT * FROM messages WHERE timestamp > %s ORDER BY channel, timestamp") % time
 cursor.execute(command)
 results = byteify(cursor.fetchall())
 
-# Clean and store results in accepted format
+# Clean and store message results in Slack-ish format
 channel_msgs = dict([(c['name'], {}) for c in channels])
 for message in results:
     message['text'] = message['message']
@@ -119,7 +125,7 @@ for channel_name in channel_msgs.keys():
         print("Channel not found: %s") %message['channel']
         continue
 
-    if not os.path.exists(dir):
+    if not os.path.isdir(dir):
         os.makedirs(dir)
 
     for day in channel_msgs[channel_name].keys():
