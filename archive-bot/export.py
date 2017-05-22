@@ -37,8 +37,9 @@ def getDate(ts):
     return datetime.datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d')
 
 
-
-time = time.time() - 86400 # One full day in seconds
+# Uncomment time in the future if running daily (Used to export last days of messages)
+#time = time.time() - 86400 # One full day in seconds
+time = 0.0
 db_path = sys.argv[1]
 arch_dir = sys.argv[2]
 if not os.path.isdir(arch_dir):

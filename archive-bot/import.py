@@ -10,7 +10,7 @@ directory = sys.argv[1]
 conn = sqlite3.connect('slack.sqlite')
 cursor = conn.cursor()
 cursor.execute('create table if not exists messages (message text, user text, channel text, timestamp text, UNIQUE(channel, timestamp) ON CONFLICT REPLACE)')
-cursor.execute('create table if not exists users (name text, id text, text avatar, UNIQUE(id) ON CONFLICT REPLACE)')
+cursor.execute('create table if not exists users (name text, id text, avatar text, UNIQUE(id) ON CONFLICT REPLACE)')
 cursor.execute('create table if not exists channels (name text, id text, UNIQUE(id) ON CONFLICT REPLACE)')
 
 print("Importing channels..")

@@ -11,7 +11,7 @@ from websocket import WebSocketConnectionClosedException
 conn = sqlite3.connect('slack.sqlite')
 cursor = conn.cursor()
 cursor.execute('create table if not exists messages (message text, user text, channel text, timestamp text, UNIQUE(channel, timestamp) ON CONFLICT REPLACE)')
-cursor.execute('create table if not exists users (name text, id text, text avatar, UNIQUE(id) ON CONFLICT REPLACE)')
+cursor.execute('create table if not exists users (name text, id text, avatar text, UNIQUE(id) ON CONFLICT REPLACE)')
 cursor.execute('create table if not exists channels (name text, id text, UNIQUE(id) ON CONFLICT REPLACE)')
 
 # This token is given when the bot is started in terminal
@@ -202,6 +202,8 @@ if sc.rtm_connect():
             for event in sc.rtm_read():
                 if event['type'] == 'message':
                     handle_message(event)
+                #elif event['type'] == 'channel_created':
+                 #   sc.api_call(channel.join,
         except WebSocketConnectionClosedException:
             sc.rtm_connect()
         except:
