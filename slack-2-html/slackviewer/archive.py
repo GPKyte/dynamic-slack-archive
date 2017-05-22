@@ -46,37 +46,27 @@ def SHA1_file(filepath):
 
 
 def extract_archive(filepath):
+    filepath=os.path.abspath(filepath)
     if os.path.isdir(filepath):
-        print("Archive already extracted. Viewing from %s") %(filepath)
-        return(os.path.abspath(filepath))
+        print("Archive already extracted. Converting %s") %(filepath)
+        return filepath
 
     if not zipfile.is_zipfile(filepath):
         # Misuse of TypeError? :P
         raise TypeError("{} is not a zipfile".format(filepath))
 
-    archive_sha = SHA1_file(filepath)
-    extracted_path = os.path.join("/tmp", "_slackviewer", archive_sha)
+    zip_dir = os.path.split(filepath)[0]
+    extracted_path = os.path.join(zip_dir, "slack-archive")
     if os.path.exists(extracted_path):
         print("{} already exists".format(extracted_path))
     else:
-        # Extract zip
+        # Extract zip in same dir as filepath
         with zipfile.ZipFile(filepath) as zip:
             print("{} extracting to {}...".format(
                 filepath,
                 extracted_path))
             zip.extractall(path=extracted_path)
         print("{} extracted to {}.".format(filepath, extracted_path))
-        # Add additional file with archive info
-        archive_info = {
-            "sha1": archive_sha,
-            "filename": os.path.split(filepath)[1]
-        }
-        with open(
-            os.path.join(
-                extracted_path,
-                ".slackviewer_archive_info.json"
-            ), 'w+'
-        ) as f:
-            json.dump(archive_info, f)
 
     return extracted_path
+

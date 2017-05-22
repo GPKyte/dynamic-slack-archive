@@ -2,6 +2,5 @@ include requirements.txt
 include README.md
 include LICENSE
 
-include slackviewer/static/*.css
-include slackviewer/static/*.js
 include slackviewer/templates/*.html
+include slackviewer/templates/*.css

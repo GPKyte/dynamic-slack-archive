@@ -17,18 +17,18 @@ long_description = read('README.md')
 
 
 setup(
-    name="slack-export-viewer",
+    name="slack-2-html",
     version=slackviewer.__version__,
-    url='https://github.com/hfaran/slack-export-viewer',
+    url='https://github.com/gpkyte/slack-2-html',
     license='MIT License',
-    author='Hamza Faran',
-    author_email='hamzafaran@outlook.com',
-    description=('Slack Export Archive Viewer'),
+    author='Gavin Kyte',
+    author_email='GPKyte@gmail.com',
+    description=('Slack Export Archive Converter'),
     long_description=long_description,
     packages=["slackviewer"],
     install_requires = install_requires,
     entry_points={'console_scripts': [
-        'slack-export-viewer = slackviewer.main:main'
+        'slack-2-html = slackviewer.main:main'
     ]},
     include_package_data=True,
     # https://github.com/mitsuhiko/flask/issues/1562
