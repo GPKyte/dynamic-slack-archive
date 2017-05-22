@@ -3,7 +3,7 @@
 A combination of Slack API and JSON conversion tools that allow one to
 maintain an archive of slack message history and view it in an easy way.
 
-![Preview][screenshot.png]
+![Preview](slack-2-html/screenshot.png)
 
 
 ## Overview
@@ -16,7 +16,7 @@ but could be used locally for yourself. Note that only Admin-level and above
 can get the export and make the changes to use this tool.
 
 ## Installation
-_For convenience I added a script you can run for most of this instead `install_all`_
+_I added a script, `install_all`, that you can use for steps 2 and 3_
 
 ### 1. Download this Repo to somewhere it will be kept
 
