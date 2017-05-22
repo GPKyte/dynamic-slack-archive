@@ -7,15 +7,16 @@ maintain an archive of slack message history and view it in an easy way.
 
 
 ## Overview
-`slack-dynamic-archive` is designed to aid small teams that use the free version of slack
+`dynamic-slack-archive` is designed to aid small teams that use the free version of slack
 and need to view messages past the 10,000 limit. This tool both routinely listens for
 then stores new messages from slack and creates a series of HTML files to view them when needed.
 
-`slack-dynamic-archive` was designed for a team to host on an established website,
+`dynamic-slack-archive` was designed for a team to host on an established website,
 but could be used locally for yourself. Note that only Admin-level and above
 can get the export and make the changes to use this tool.
 
 ## Installation
+_For convenience I added a script you can run for most of this instead `install_all`_
 
 ### 1. Download this Repo to somewhere it will be kept
 
@@ -23,15 +24,9 @@ Clone this repo and go to the directory for the next steps
 
 ### 2. Install the converter
 
-It's recommend to use pipsi [`pipsi`](https://github.com/mitsuhiko/pipsi) for a nice
-isolated install.
+Use `pip` to install from the local folder
 ```bash
-pipsi install slack-2-html
-```
-
-Or you can use `pip` if you prefer to.
-```bash
-pip install slack-2-html
+pip install ./slack-2-html
 ```
 
 `slack-2-html` will be installed as an entry-point; run from anywhere.
@@ -46,15 +41,17 @@ Options:
   --help             Show this message and exit.
 ```
 
-### 3. Create and install the archive bot
+### 3. Install the archive bot
 
-Create a new [bot user](https://api.slack.com/bot-users) on your slack
-channel and get the API key for step 4 under Usage.
-
-And install using `pip`
+Install using `pip`
 ```bash
 pip install -r archive-bot/requirements.txt
 ```
+
+### 4. Create archive bot
+
+Create a new [bot user](https://api.slack.com/bot-users) on your slack
+channel and get the API key for step 4 under Usage.
 
 
 ## Usage
@@ -97,6 +94,7 @@ The bot will now run in the background. Be careful not to let your machine sleep
 you will need to re-run this process.
 
 ### 5) Update archive as needed
+_Note that I included a script to export and update these files as well_
 
 To export the database into the file format for the converter, run this in the install folder:
 ```bash
@@ -142,7 +140,7 @@ Code released under the [MIT license](LICENSE).
 
 ### Improvements and changes in design
 
-`slack-dynamic-archive` is a culmination of tools. It changes `slack-archive-viewer` into
+`dynamic-slack-archive` is a culmination of tools. It changes `slack-archive-viewer` into
 an file generator, removing the flask app. This removes some functionality, but allowed for
 my team to use it in our website for greater access. In summary, I added:
 

@@ -1,0 +1,3 @@
+DIR="$(dirname $0)"
+python "$DIR/archive-bot/export.py" "$DIR/archive-bot/slack.sqlite" "$DIR/slack-archive"
+slack-2-html -z "$DIR/slack-archive"
