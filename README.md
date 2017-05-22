@@ -3,7 +3,7 @@
 A combination of Slack API and JSON conversion tools that allow one to
 maintain an archive of slack message history and view it in an easy way.
 
-![Preview][slack-2-html/screenshot.png]
+![Preview][screenshot.png]
 
 
 ## Overview
