@@ -77,7 +77,7 @@ class Message(object):
     @property
     def img(self):
         try:
-            return self.__USER_DATA[self._message["user"]]["profile"]["image_32"]
+            return self.__USER_DATA[self._message["user"]]["profile"]["image_72"]
         except KeyError:
             return ""
 

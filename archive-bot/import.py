@@ -23,7 +23,7 @@ print("- Channels imported")
 print("Importing users..")
 with open(os.path.join(directory, 'users.json')) as f:
     users = json.load(f)
-args = [(u['name'], u['id'], u['profile']['image_32']) for u in users]
+args = [(u['name'], u['id'], u['profile']['image_72']) for u in users]
 cursor.executemany('INSERT INTO users VALUES(?,?,?)', (args))
 print("- Users imported")
 

@@ -42,7 +42,7 @@ def update_users():
         args.append((
             m['name'],
             m['id'],
-            m['profile'].get('image_32', 'https://secure.gravatar.com/avatar/c3a07fba0c4787b0ef1d417838eae9c5.jpg?s=32&d=https%3A%2F%2Ffst.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0024-32.png')
+            m['profile'].get('image_72', 'https://secure.gravatar.com/avatar/c3a07fba0c4787b0ef1d417838eae9c5.jpg?s=32&d=https%3A%2F%2Ffst.slack-edge.com%2F66f9%2Fimg%2Favatars%2Fava_0024-32.png')
         ))
     cursor.executemany("INSERT INTO users(name, id, avatar) VALUES(?,?,?)", args)
     conn.commit()
@@ -176,7 +176,7 @@ def handle_query(event):
 def handle_message(event):
     if 'text' not in event:
         return
-    if 'username' in event and event['username'] == 'bot':
+    if 'user' in event and event['user'] == 'bot':
         return
 
     try:
@@ -187,23 +187,27 @@ def handle_message(event):
     # If it's a DM, treat it as a search query
     if event['channel'][0] == 'D':
         handle_query(event)
+    elif 'user' not in event:
+        print("No valid user. Previous event not saved")
     else: # Otherwise save the message to the archive.
         cursor.executemany('INSERT INTO messages VALUES(?, ?, ?, ?)',
             [(event['text'], event['user'], event['channel'], event['ts'])]
         )
         conn.commit()
+        print("--------------------------")
 
 # Loop
 if sc.rtm_connect():
     update_users()
+    print('Users updated')
     update_channels()
+    print('Channels updated')
+    print('Archive bot online. Messages will now be recorded...')
     while True:
         try:
             for event in sc.rtm_read():
                 if event['type'] == 'message':
                     handle_message(event)
-                #elif event['type'] == 'channel_created':
-                 #   sc.api_call(channel.join,
         except WebSocketConnectionClosedException:
             sc.rtm_connect()
         except:

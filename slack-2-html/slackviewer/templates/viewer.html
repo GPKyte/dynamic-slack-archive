@@ -6,7 +6,8 @@
     <link rel=stylesheet type=text/css
           href="{{ 'viewer.css' }}">
 </head>
-<body>
+<!--Small hack with the y-value to scroll to bottom of screen on load-->
+<body onLoad="window.scroll(0, 10000000000000000000000)">
 <div id="fixed">
     <h3>Channels</h3>
     <ul id="channel-list">
@@ -34,9 +35,5 @@
         <br/>
     {% endfor %}
 </div>
-<script type='text/javascript'>
-    var objDiv = document.getElementById("fluid");
-    objDiv.scrollTop = objDiv.scrollHeight;
-</script>
 </body>
 </html>

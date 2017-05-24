@@ -5,7 +5,8 @@
 body {
     text-align: center;
     padding: 1em;
-    width: 700px;
+    width: 100%;
+    max-width: 700px;
 }
 
 #fixed {
@@ -39,16 +40,12 @@ body {
 }
 
 .messages {
-    overflow: auto;
+    position: element(#fixed);
+    transform: translateX(100px);
     width: 100%;
-    max-width: 70vw;
+    max-width: 450px;
     text-align: left;
     display: inline-block;
-    /* For some reason, this pads from the left of the screen
-    as opposed to the right of the #fixed div, so we have a decent-ish 25vw
-    padding to cover most screens
-    XXX Still a hack though */
-    padding-left: 20vw;
 }
 
 .messages img {
