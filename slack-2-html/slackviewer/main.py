@@ -30,8 +30,12 @@ def flag_ennvar(name):
 
 @click.command()
 @click.option("-z", "--archive", type=click.Path(), required=True,
-              default=envvar('SEV_ARCHIVE', ''))
-def main(archive):
+              default=envvar('SEV_ARCHIVE', ''),
+              help="Path to your Slack export archive (.zip file or directory)")
+@click.option("-d", "--destination", type=click.Path(), required=False,
+              default=envvar('SEV_DESTINATION', ''),
+              help="Path to export your archive web files to")
+def main(archive, destination):
     if not archive:
         raise ValueError("Empty path provided for archive")
 
@@ -41,14 +45,17 @@ def main(archive):
     channels = compile_channels(arch_path, user_data, channel_data)
 
     path = os.path.join(os.path.split(arch_path)[0], 'archive-webview')
+    if destination:
+        path = destination
+
     if not os.path.isdir(path):
         os.makedirs(path)
-    env = Environment(loader = PackageLoader('slackviewer', 'templates'),
-                      autoescape=select_autoescape(['html', 'xml']))
     css_src = os.path.join(slackviewer.__path__[0], "templates/viewer.css")
     css_des = os.path.join(path, 'viewer.css')
     shutil.copy2(css_src, css_des)
 
+    env = Environment(loader = PackageLoader('slackviewer', 'templates'),
+                      autoescape=select_autoescape(['html', 'xml']))
     template = env.get_template('viewer.html')
     for name in sorted(channels):
         page = template.render(messages=channels[name],
